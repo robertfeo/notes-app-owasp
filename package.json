@@ -5,12 +5,14 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app"
+    "start": "node app",
+    "build:css": "npx postcss public/css/tailwind.css -o public/css/tailwind.css"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "autoprefixer": "^10.4.14",
     "body-parser": "^1.20.2",
     "bootstrap": "^5.2.3",
     "dotenv": "^16.0.3",
@@ -20,6 +22,11 @@
     "method-override": "^3.0.0",
     "mysql": "^2.18.1",
     "mysql2": "^3.2.4",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "tailwindcss": "^3.3.2"
+  },
+  "devDependencies": {
+    "postcss": "^8.4.23",
+    "postcss-cli": "^10.1.0"
   }
 }

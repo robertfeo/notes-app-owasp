@@ -73,3 +73,14 @@ body {
   font-size: 24px;
   color: #212529;
 }
+
+body {
+  background-color: #f0f0f0;
+}
+.jumbotron {
+  background-color: #f0f0f0;
+  border-radius: 0;
+}
+.card {
+  border-radius: 0;
+}
