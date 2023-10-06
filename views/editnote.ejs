@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>ITSecLab - Robert & Alex</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-white shadow py-4">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+          <a class="text-2xl font-bold text-blue-500" href="/">MindPad</a>
+          <div class="flex items-center">
+            <% if (userId) { %>
+            <a class="text-gray-600 mr-4" href="/notes">Notes</a>
+            <% } %> <% if (userId) { %>
+            <span class="text-gray-600 mr-4"><%= username %></span>
+            <a class="text-gray-600" href="/logout">Logout</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mt-16">
+      <h1 class="text-3xl font-bold mb-6">Edit Note</h1>
+      <form
+        action="/edit-note/<%= note.note_id %>?_method=PUT"
+        method="POST"
+        class="bg-white p-6 rounded shadow-md"
+      >
+        <div class="mb-4">
+          <label for="title" class="block text-gray-700 text-sm font-bold mb-2"
+            >Title:</label
+          >
+          <input
+            type="text"
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-md"
+            id="title"
+            name="title"
+            value="<%= note.title %>"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="note" class="block text-gray-700 text-sm font-bold mb-2"
+            >Note:</label
+          >
+          <textarea
+            class="form-textarea block w-full px-3 py-2 border border-gray-300 rounded-md"
+            id="note"
+            name="content"
+            rows="3"
+          >
+<%= note.content %></textarea
+          >
+        </div>
+        <button
+          type="submit"
+          class="btn bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        >
+          Update Note
+        </button>
+        <a
+          href="/notes"
+          class="btn bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+          >Cancel</a
+        >
+      </form>
+    </div>
+  </body>
+</html>

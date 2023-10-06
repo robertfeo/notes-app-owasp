@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>ITSecLab - Robert & Alex</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-white shadow py-4">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+          <a class="text-2xl font-bold text-blue-500" href="/">MindPad</a>
+          <div class="flex items-center">
+            <% if (req.session.userId) { %>
+            <a class="text-gray-600 mr-4" href="/notes">Notes</a>
+            <% } %> <% if (!req.session.userId) { %>
+            <a class="text-gray-600 mr-4" href="/login">Login</a>
+            <% } %> <% if (req.session.userId) { %>
+            <span class="text-gray-600 mr-4"><%= req.session.username %></span>
+            <a class="text-gray-600" href="/logout">Logout</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mt-16">
+      <h1 class="text-4xl font-bold mb-8">Notes</h1>
+      <!-- Add a note -->
+      <form action="/notes" method="POST" class="space-y-4">
+        <div class="relative">
+          <input
+            type="text"
+            name="title"
+            id="title"
+            placeholder="Title"
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-md"
+            required
+          />
+        </div>
+        <div class="relative">
+          <textarea
+            name="note"
+            id="note"
+            placeholder="Note"
+            class="form-textarea block w-full px-3 py-2 border border-gray-300 rounded-md"
+            rows="3"
+            required
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          class="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600"
+        >
+          Add Note
+        </button>
+      </form>
+
+      <!-- List of notes -->
+      <% if(notes.length > 0) { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <% notes.forEach((note) => { %>
+        <div class="bg-white shadow rounded p-6">
+          <h5 class="text-xl font-bold mb-4"><%- note.title %></h5>
+          <p class="text-gray-600 mb-4"><%- note.content %></p>
+          <div class="flex justify-between">
+            <a
+              href="/edit-note/<%= note.note_id %>"
+              class="btn bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              >Edit</a
+            >
+            <a
+              href="/delete/<%= note.note_id %>"
+              class="btn bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+              >Delete</a
+            >
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <p class="text-gray-600 mt-4">No notes found.</p>
+      <% } %>
+    </div>
+  </body>
+</html>
