@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import url from "url";
 import path from "path";
-import methodeOverride from "method-override";
+import methodOverride from "method-override";
 
 // Importiere benutzerdefinierte Funktionen aus database.js
 import {
@@ -17,7 +17,8 @@ import {
   fetchNoteById,
   getUsers,
   validateUserCredentials,
-  weakAuthenticate,
+  deleteNote,
+  pool
 } from "./database/database.js";
 
 // Importiere readFile Funktion aus fs/promises Modul
@@ -32,25 +33,24 @@ dotenv.config();
 // Erstelle eine Express-Anwendung
 const app = express();
 
-// Setze den Port, auf dem die Anwendung lauschen soll
-const PORT = process.env.WEBAPP_SERVICE_PORT;
-
-// Definiere die MySQL-Datenbankkonfiguration mit Umgebungsvariablen
-const DB_CONFIG = {
-  host: process.env.MYSQL_HOST_LOCAL,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-};
+// Setze den Port, auf dem die Anwendung laufen soll
+const PORT = process.env.WEBAPP_SERVICE_APP_PORT;
 
 app.set("view engine", "ejs");
 
-// Serve favicon.ico file
-app.get("/favico.ico", (req, res) => {
-  res.sendFile("./myfavico.ico");
-});
-
 // Set up express-session
+
+/* OWASP Top 10: A02:2021 – Cryptographic Failures
+In der Verwendung von express-session wird ein schwaches Geheimnis 1234 verwendet. Dieses Geheimnis
+ kann leicht erraten oder durch Brute-Force-Angriffe geknackt werden. Es wird empfohlen, 
+ ein starkes, zufällig generiertes Geheimnis mit ausreichender Länge und Komplexität zu verwenden. */
+
+ /* A05:2021 – Security Misconfiguration (Sicherheitsfehlkonfiguration)
+
+ Das Cookie-Attribut secure ist auf false gesetzt. Dies kann dazu führen, dass die Anwendung 
+ anfällig für Man-in-the-Middle-Angriffe wird, bei denen Angreifer unverschlüsselte Cookies 
+ abfangen können. Es wird empfohlen, das secure-Attribut auf true zu setzen, wenn Ihre Anwendung 
+ über HTTPS bereitgestellt wird */
 app.use(
   session({
     secret: "1234",
@@ -60,6 +60,7 @@ app.use(
       maxAge: 60000 * 60 * 24,
       sameSite: true,
       secure: false,
+      httpOnly: true
     },
   })
 );
@@ -68,7 +69,7 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
-app.use(methodeOverride("_method"));
+app.use(methodOverride("_method"));
 
 // Funktion zum Ausführen einer SQL-Datei mit der angegebenen MySQL-Verbindung
 async function executeSQLFile(filePath, connection) {
@@ -96,14 +97,14 @@ async function executeSQLFile(filePath, connection) {
 async function initializeDatabase() {
   try {
     // Stelle eine Verbindung zur MySQL-Datenbank her
-    const connection = await mysql.createConnection(DB_CONFIG);
+    const connection = await pool.getConnection();
     console.log("✅\tConnected to database");
 
     // Führe die schema.sql-Datei aus
     await executeSQLFile("./database/schema.sql", connection);
 
     // Beende die Verbindung zur Datenbank
-    connection.end();
+    connection.release();
   } catch (err) {
     console.error("❌\tError connecting to MySQL database:", err);
   }
@@ -133,8 +134,11 @@ const basicAuth = (req, res, next) => {
   }
 };
 
-/* OWASP Top 10: A5:2021 Security Misconfiguration
-/allnotes endpoint is not properly protected, and anyone who knows the URL can access it. */
+/* A07:2021 – Identification and Authentication Failures (Identifizierungs- und Authentifizierungsfehler)
+
+Der Endpunkt /allnotes ist nicht ordnungsgemäß geschützt, und jeder, der die URL kennt, kann darauf zugreifen. 
+Um dies zu beheben, muss die basicAuth-Middleware hinzugefügt werden, um sicherzustellen, dass nur authentifizierte 
+Benutzer Zugriff auf den Endpunkt haben */
 app.get("/allnotes", async (req, res) => {
   //  LÖSUNG
   /* // Check if user is logged in
@@ -176,6 +180,12 @@ app.post("/login", async (req, res) => {
       // Set the session data
       req.session.userId = user.user_id;
       req.session.username = user.username;
+      req.session.password = user.password;
+
+      const userData = JSON.stringify({ id: user.id, username: user.username, password: user.password });
+
+      res.cookie("sessionId", req.sessionID, { httpOnly: false });
+      res.cookie("userData", userData, { httpOnly: false });
 
       // Redirect to user's notes
       res.redirect("/notes");
@@ -185,10 +195,10 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     if (error.sqlMessage) {
-      console.log("SQL error:", error);
+      console.error("SQL error:", error);
       res.render("login", { error: error });
     } else {
-      console.log("Non-SQL error:", error);
+      console.error("Non-SQL error:", error);
       res.render("login", { error: "An error occurred" });
     }
   }
@@ -219,10 +229,10 @@ app.get("/notes", async (req, res) => {
   }
 });
 
-app.post("/notes", (req, res) => {
+app.post("/notes", async (req, res) => {
   const title = req.body.title;
   const note = req.body.note;
-  createNote(req.session.userId, title, note);
+  await createNote(req.session.userId, title, note);
   res.redirect("/notes");
 });
 
@@ -256,7 +266,7 @@ app.get("/edit-note/:note_id", basicAuth, async (req, res) => {
   }
 });
 
-app.put("/edit-note/:note_id", basicAuth, async (req, res) => {
+app.post("/edit-note/:note_id", basicAuth, async (req, res) => {
   // Check if user is logged in
   if (!req.session.userId) {
     res.redirect("/login");
@@ -276,6 +286,21 @@ app.put("/edit-note/:note_id", basicAuth, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error occurred while updating note");
+  }
+});
+
+app.post("/delete-note/:note_id", async (req, res) => {
+  try {
+    const noteId = req.params.note_id;
+
+    // Delete the note with the given ID
+    await deleteNote(noteId);
+
+    // Redirect to user's notes
+    res.redirect("/notes");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error occurred while deleting note");
   }
 });
 

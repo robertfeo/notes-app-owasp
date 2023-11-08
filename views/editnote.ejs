@@ -6,71 +6,104 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>ITSecLab - Robert & Alex</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
       rel="stylesheet"
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
     />
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <style>
+      body {
+        background-color: #f0f0f0;
+      }
+      .jumbotron {
+        background-color: #f0f0f0;
+        border-radius: 0;
+      }
+      .card {
+        border-radius: 0;
+      }
+
+      .btn {
+        height: auto; /* adjust to your desired height */
+        max-width: 120px; /* adjust to your desired width */
+        margin: 15px;
+        margin-bottom: 5px;
+        margin-left: 0px;
+        margin-top: 0px;
+      }
+    </style>
   </head>
-  <body class="bg-gray-100">
-    <nav class="bg-white shadow py-4">
-      <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
-          <a class="text-2xl font-bold text-blue-500" href="/">MindPad</a>
-          <div class="flex items-center">
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">MindPad</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
             <% if (userId) { %>
-            <a class="text-gray-600 mr-4" href="/notes">Notes</a>
-            <% } %> <% if (userId) { %>
-            <span class="text-gray-600 mr-4"><%= username %></span>
-            <a class="text-gray-600" href="/logout">Logout</a>
+            <li class="nav-item">
+              <a class="nav-link animate__animated" href="/notes">Notes</a>
+            </li>
             <% } %>
-          </div>
+          </ul>
+          <% if (userId) { %>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <span class="nav-link"><%= username %></span>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+          </ul>
+          <% } %>
         </div>
       </div>
     </nav>
 
-    <div class="container mx-auto px-4 mt-16">
-      <h1 class="text-3xl font-bold mb-6">Edit Note</h1>
+    <div class="container my-5">
+      <h1>Edit Note</h1>
+      <hr />
       <form
-        action="/edit-note/<%= note.note_id %>?_method=PUT"
+        action="/edit-note/<%= note.note_id %>"
         method="POST"
-        class="bg-white p-6 rounded shadow-md"
+        class="my-4"
       >
-        <div class="mb-4">
-          <label for="title" class="block text-gray-700 text-sm font-bold mb-2"
-            >Title:</label
-          >
+        <div class="form-group mb-4">
+          <label for="title">Title:</label>
           <input
             type="text"
-            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-md"
+            class="form-control"
             id="title"
             name="title"
             value="<%= note.title %>"
           />
         </div>
-        <div class="mb-4">
-          <label for="note" class="block text-gray-700 text-sm font-bold mb-2"
-            >Note:</label
-          >
-          <textarea
-            class="form-textarea block w-full px-3 py-2 border border-gray-300 rounded-md"
-            id="note"
-            name="content"
-            rows="3"
-          >
-<%= note.content %></textarea
+        <div class="form-group mb-4">
+          <label for="note">Note:</label>
+          <textarea class="form-control" id="note" name="content" rows="3">
+      <%= note.content %></textarea
           >
         </div>
-        <button
-          type="submit"
-          class="btn bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-        >
-          Update Note
-        </button>
-        <a
-          href="/notes"
-          class="btn bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
-          >Cancel</a
-        >
+        <button type="submit" class="btn btn-primary mb-4">Update Note</button>
+        <a href="/notes" class="btn btn-secondary mb-4">Cancel</a>
       </form>
     </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
