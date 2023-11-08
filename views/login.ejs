@@ -5,62 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>ITSecLab - Robert & Alex</title>
-    <link href="/css/tailwind.min.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <style>
+      body {
+        background-color: #f0f0f0;
+      }
+      .jumbotron {
+        background-color: #f0f0f0;
+        border-radius: 0;
+      }
+      .card {
+        border-radius: 0;
+      }
+    </style>
   </head>
   <body>
-    <nav class="bg-white shadow py-4">
-      <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
-          <a class="text-2xl font-bold text-blue-500" href="/">MindPad</a>
-        </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">MindPad</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
       </div>
     </nav>
 
-    <div class="container mx-auto px-4 mt-16">
-      <div class="w-full max-w-md mx-auto">
-        <div class="bg-white shadow-lg rounded p-8">
-          <h2 class="text-3xl font-bold mb-4 text-center">Login</h2>
-          <form action="/login" method="POST" class="space-y-4">
-            <div class="relative">
-              <input
-                type="text"
-                name="username"
-                id="username"
-                placeholder="Username"
-                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-sm-8 col-md-6 col-lg-4">
+          <div class="card shadow-lg">
+            <div class="card-header">
+              <h3 class="card-title text-center">Login</h3>
             </div>
-            <div class="relative">
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Password"
-                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
+            <div class="card-body">
+              <form action="/login" method="POST" class="my-4">
+                <div class="form-floating mb-3">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                    placeholder="Username"
+                  />
+                  <label for="username">Username</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                  />
+                  <label for="password">Password</label>
+                </div>
+                <div class="form-check mb-3">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="show-password"
+                  />
+                  <label class="form-check-label" for="show-password">
+                    Show Password
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Login
+                </button>
+              </form>
+              <script>
+                document
+                  .getElementById("show-password")
+                  .addEventListener("change", function (event) {
+                    const passwordInput = document.getElementById("password");
+                    if (event.target.checked) {
+                      passwordInput.type = "text";
+                    } else {
+                      passwordInput.type = "password";
+                    }
+                  });
+              </script>
+              <% if (error) { %>
+              <div class="alert alert-danger">
+                <p><%= error %></p>
+              </div>
+              <% } %>
+              <p class="text-center">
+                Don't have an account?
+                <a href="/register" class="link-primary">Register now</a>
+              </p>
             </div>
-            <button
-              type="submit"
-              class="bg-blue-500 text-white w-full py-2 px-6 rounded hover:bg-blue-600"
-            >
-              Login
-            </button>
-          </form>
-
-          <% if (error) { %>
-          <div class="alert alert-danger">
-            <p><%= error %></p>
           </div>
-          <% } %>
-
-          <p class="text-center mt-4">
-            Don't have an account?
-            <a href="/register" class="text-blue-500 hover:text-blue-600"
-              >Register now</a
-            >
-          </p>
         </div>
       </div>
     </div>

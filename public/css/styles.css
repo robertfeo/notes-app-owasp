@@ -74,13 +74,14 @@ body {
   color: #212529;
 }
 
-body {
-  background-color: #f0f0f0;
+.alert {
+  width: 100%;
+  height: auto;
+  display: table;
 }
-.jumbotron {
-  background-color: #f0f0f0;
-  border-radius: 0;
-}
-.card {
-  border-radius: 0;
+
+.alert p {
+  text-align: center;
+  vertical-align: middle;
+  display: table-cell;
 }
