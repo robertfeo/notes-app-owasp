@@ -1,6 +1,6 @@
 // Importiere notwendige Module
-import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import mysql from "mysql2/promise";
 
 // Lade Umgebungsvariablen aus .env-Datei
 dotenv.config();
@@ -22,13 +22,11 @@ export async function validateUserCredentials(username, password) {
     const [rows] = await pool.query(
       `SELECT * FROM User WHERE username = '${username}' AND password = '${password}'`
     );
-
     //  Injection vermeiden:
     /* const [rows] = await pool.execute(
       `SELECT * FROM User WHERE username = ? AND password = ?`,
       [username, password]
     ); */
-
     if (rows.length > 0) {
       return rows[0];
     } else {
@@ -108,7 +106,6 @@ export async function createNote(user_id, title, content) {
   try {
     const sql = "INSERT INTO Note (user_id, title, content) VALUES (?, ?, ?)";
     const values = [user_id, title, content];
-
     const [result] = await pool.execute(sql, values);
     return result;
   } catch (err) {
